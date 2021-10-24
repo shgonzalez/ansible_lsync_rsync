@@ -1,0 +1,9 @@
+sync_nodes:
+  - server1.mydomain.local
+  - server2.mydomain.local
+
+user_replication: wildfly
+home_user_replication: /home/wildfly
+sync_folders:
+  - /wildfly/repo
+  - /wildfly/repo2
