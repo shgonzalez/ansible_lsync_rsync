@@ -7,3 +7,4 @@ home_user_replication: /home/wildfly
 sync_folders:
   - /wildfly/repo
   - /wildfly/repo2
+  - /wildfly/repo2
