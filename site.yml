@@ -1,0 +1,6 @@
+---
+- name: apply replication
+  hosts: all
+  serial: 1
+  roles:
+    - lsync_rsync

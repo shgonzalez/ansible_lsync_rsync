@@ -1,0 +1,28 @@
+---
+- name: Check file {{ home_user_replication }}/.ssh/id_rsa_lsync
+  stat:
+    path: "{{ home_user_replication }}/.ssh/id_rsa_lsync"
+  register: keypair
+
+- name: Generate an OpenSSH rsa keypair
+  shell: ssh-keygen -t rsa -b 2048 -C "ansible_{{ user_replication }}_scp" -f {{ home_user_replication }}/.ssh/id_rsa_lsync -N '' && chown -R {{ user_replication }}:{{ user_replication }} {{ home_user_replication }}/.ssh/
+  register: id_rsa_lsync
+  when: keypair.stat.exists == False
+
+- name: read pub file
+  shell: cat {{ home_user_replication }}/.ssh/id_rsa_lsync.pub
+  register: pubfile
+  #when: keypair.stat.exists == False
+
+- name: debug
+  debug:
+    var: pubfile
+  #when: keypair.stat.exists == False
+
+- name: copy public key to nodes
+  authorized_key: 
+    user: "{{ user_replication }}"
+    key: "{{ pubfile.stdout }}"
+    state: present
+  delegate_to: "{{ lookup('dig', item)}}"
+  loop: "{{ sync_nodes }}"

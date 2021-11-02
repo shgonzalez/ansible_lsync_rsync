@@ -1,0 +1,7 @@
+---
+# handlers file for lsync_rsync
+- name: restart lsyncd
+  service:
+    name: lsyncd 
+    state: restarted
+    enabled: yes

@@ -1,0 +1,48 @@
+----
+-- {{ ansible_managed }} 
+---
+-- User configuration file for lsyncd.
+--
+-- Simple example for default rsync, but executing moves through on the target.
+--
+-- For more examples, see /usr/share/doc/lsyncd*/examples/
+--
+settings {
+    logfile = "/var/log/lsyncd/lsyncd.log",
+    statusFile = "/var/log/lsyncd/lsyncd.stat",
+    statusInterval = 2,
+    insist = true,
+}
+
+servers = {
+{# se saca de la lista el mismo node, no tiene sentido replicarse a si mismo #}
+{# I intentionally delete the same node on the current server, this is because makes no sense to replicate itself #}
+{# '\n' intencionalmente para legibilidad #}
+{# '\n' for legibility purpose #}
+{% for node  in sync_nodes | reject('match', inventory_hostname)|list %}
+    "{{ node }}"{% if not loop.last %},{{ '\n' }}{% endif %}
+{% endfor %}{{ '\n' }}
+}
+
+
+{% for directory in sync_folders %}
+    
+
+for _, server in ipairs( servers ) do
+    sync {
+        default.rsync,
+        source = "{{ directory }}",
+        target = server .. ":{{ directory }}",
+        rsync    = {
+            archive  = true,
+            compress = false,
+            perms    = true,
+            owner    = true,
+            update   = true,
+            whole_file = true,
+            rsh ="/usr/bin/ssh -l {{ user_replication }} -i {{ home_user_replication }}/.ssh/id_rsa_lsync -o StrictHostKeyChecking=false",
+        },
+        exclude = { ".*.swp" }
+    }
+end
+{% endfor %}

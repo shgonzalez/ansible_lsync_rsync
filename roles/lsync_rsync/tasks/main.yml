@@ -1,0 +1,29 @@
+---
+# tasks file for lsync_rsync
+- name: Include conf priv/pub keys
+  include_tasks: conf_keys.yml
+
+- name: install lsyncd
+  package:
+    name: lsyncd
+    state: present
+
+- name: install rsync
+  package:
+    name: rsync
+    state: present
+
+- name: configure /etc/lsyncd.conf
+  template:
+    src: lsyncd.conf.j2
+    dest: /etc/lsyncd.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart lsyncd
+
+- name: Start service lsyncd
+  service:
+    name: lsyncd 
+    state: started
+    enabled: yes
